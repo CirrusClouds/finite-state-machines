@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define BUFFERSIZE 40
-#define DEBUG 0
+#define DEBUG 1
 
 int matchstar(int c, char* seq, char* text, int length) {
   if (DEBUG) {
@@ -32,7 +32,7 @@ int matchplus(int c, char* seq, char* text, int length) {
   return 0;
 }
 
-int findexprlength(char* regexp, char c) {
+int findexprlength(char* regexp, int c) {
   if (regexp[0] == ')') {
     return c;
   }
@@ -54,6 +54,9 @@ int matchhere(char* regexp, char* text) {
   }
   
   if (regexp[0] == '(') {
+    if (DEBUG) {
+      printf("Bracket found");
+    }
     brackets = 1;
     regexp++;
     length = findexprlength(regexp, 0);
@@ -96,15 +99,17 @@ int matchhere(char* regexp, char* text) {
 }
 
 int match(char* regexp, char* text) {
+  printf("Begin\n");
+  
   if (regexp[0] == '^') {
     return matchhere(regexp+1, text);
   }
-  
+
   do {
     if (DEBUG) {
       printf("Match iteration\n");
     }
-    if (matchhere(regexp, text)) {
+   if (matchhere(regexp, text)) {
       return 1;
     }
   } while (*text++ != '\0');
