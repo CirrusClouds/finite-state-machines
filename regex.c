@@ -118,6 +118,10 @@ int match(char* regexp, char* text) {
 }
 
 int main(int argc, char* argv[]) {
+  if (argv[1] == NULL || argv[2] == NULL) {
+    printf("Requires 2 CLI arguments! in the form <pattern> <string>\n");
+    return 0;
+  }
   printf("%i\n", match(argv[1], argv[2]));
   return 0;
 }
