@@ -40,6 +40,16 @@ int findexprlength(char* regexp, int c) {
     return findexprlength(regexp+1, c+1);
   }
 }
+
+int matchescaped(char c, char* text) {
+  if (c==text[0]) {
+    if (DEBUG) {
+      printf("Matched an escape character\n");
+    }
+    return 1;
+  }
+  return 0;
+}
               
 
 int matchhere(char* regexp, char* text) {
@@ -52,10 +62,21 @@ int matchhere(char* regexp, char* text) {
     printf("REGEX: %s\n", regexp);
     printf("STRING: %s\n", text);
   }
+
+  if (regexp[0] == '\\') {
+    if (DEBUG) {
+      printf("Escape character found\n");
+    }
+    
+    regexp++;
+    if (matchescaped(regexp[0], text)) {
+      return matchhere(regexp+1, text+1);
+    }
+  }
   
   if (regexp[0] == '(') {
     if (DEBUG) {
-      printf("Bracket found");
+      printf("Bracket found\n");
     }
     brackets = 1;
     regexp++;
@@ -88,7 +109,7 @@ int matchhere(char* regexp, char* text) {
     printf("STRING: %s\n", text);
   }
 
-  if (regexp[0] == '\0' || regexp[0] == ')') {
+  if (regexp[0] == '\0') {
     return 1;
   };
 
@@ -99,7 +120,9 @@ int matchhere(char* regexp, char* text) {
 }
 
 int match(char* regexp, char* text) {
-  printf("Begin\n");
+  if (DEBUG) {
+    printf("Begin\n");
+  }
   
   if (regexp[0] == '^') {
     return matchhere(regexp+1, text);
@@ -125,3 +148,6 @@ int main(int argc, char* argv[]) {
   printf("%i\n", match(argv[1], argv[2]));
   return 0;
 }
+
+
+/* todo: match except, optional, ranges */
