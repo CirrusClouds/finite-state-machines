@@ -40,21 +40,12 @@ int findexprlength(char* regexp, int c) {
     return findexprlength(regexp+1, c+1);
   }
 }
-
-int matchescaped(char c, char* text) {
-  if (c==text[0]) {
-    if (DEBUG) {
-      printf("Matched an escape character\n");
-    }
-    return 1;
-  }
-  return 0;
-}
-              
+   
 
 int matchhere(char* regexp, char* text) {
   
   int brackets = 0;
+  int escaped = 0;
   int length = 1;
 
   if (DEBUG) {
@@ -67,14 +58,11 @@ int matchhere(char* regexp, char* text) {
     if (DEBUG) {
       printf("Escape character found\n");
     }
-    
+    escaped = 1;
     regexp++;
-    if (matchescaped(regexp[0], text)) {
-      return matchhere(regexp+1, text+1);
-    }
   }
-  
-  if (regexp[0] == '(') {
+    
+  if (regexp[0] == '(' && !escaped) {
     if (DEBUG) {
       printf("Bracket found\n");
     }
@@ -83,7 +71,7 @@ int matchhere(char* regexp, char* text) {
     length = findexprlength(regexp, 0);
   }
 
-  if (regexp[brackets+length] == '*') {
+  if (regexp[brackets+length] == '*' && !escaped) {
     char* copied;
     memcpy(copied, &regexp[0], length);
     copied[length] = '\0';
@@ -91,7 +79,7 @@ int matchhere(char* regexp, char* text) {
     regexp = regexp + brackets+length+1;
   };
 
-  if (regexp[brackets+length] == '+') {
+  if (regexp[brackets+length] == '+' && !escaped) {
     char* copied;
     memcpy(copied, &regexp[0], length);
     copied[length] = '\0';
@@ -150,4 +138,4 @@ int main(int argc, char* argv[]) {
 }
 
 
-/* todo: match except, optional, ranges */
+/* todo: match except, optional, list selection (treat these like a loop on escapes?) */
